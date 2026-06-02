@@ -8,10 +8,7 @@
 <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
     <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 20% 50%, #6366f1 0%, transparent 50%), radial-gradient(circle at 80% 20%, #8b5cf6 0%, transparent 40%);"></div>
     <div class="relative max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-28 text-center">
-        <div class="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-sm font-medium px-4 py-1.5 rounded-full mb-6 fade-up">
-            <span class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></span>
-            Génie Informatique & Télécommunications — EPAC
-        </div>
+       
         <h1 class="font-playfair text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 fade-up" style="animation-delay: 0.1s; line-height: 1.1;">
             Bienvenue sur<br>
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">mon Blog</span>
