@@ -54,7 +54,11 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache \
     && mkdir -p /var/log/supervisor \
-    && mkdir -p /var/run
+    && mkdir -p /var/run \
+    && mkdir -p /var/lib/nginx/tmp/client_body \
+    && chown -R www-data:www-data /var/lib/nginx \
+    && chown -R www-data:www-data /var/log/nginx \
+    && chown -R www-data:www-data /var/run
 
 # Config Nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
