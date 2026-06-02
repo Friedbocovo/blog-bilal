@@ -51,7 +51,9 @@ RUN npm run build
 # Permissions storage et cache
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && mkdir -p /var/log/supervisor \
+    && mkdir -p /var/run
 
 # Config Nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
