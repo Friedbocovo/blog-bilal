@@ -7,6 +7,7 @@ use App\Models\Mention;
 use App\Models\Post;
 use App\Models\User;
 use App\Notifications\MentionedInComment;
+use App\Notifications\NewComment;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -29,6 +30,12 @@ class CommentController extends Controller
             'parent_id' => $validated['parent_id'] ?? null,
             'body' => $validated['body'],
         ]);
+
+        // Notifier l'auteur du post si ce n'est pas lui qui commente
+        $postAuthor = $post->author;
+        if ($postAuthor && $postAuthor->id !== auth()->id()) {
+            $postAuthor->notify(new NewComment($comment));
+        }
 
         // Detect mentions
         preg_match_all('/@([\w]+)/', $validated['body'], $matches);
@@ -53,7 +60,6 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment)
     {
-        // Check if user is admin or comment author
         if (!auth()->user()->isAdmin() && auth()->id() !== $comment->user_id) {
             abort(403);
         }

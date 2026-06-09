@@ -11,10 +11,16 @@
             <h1 class="font-playfair text-3xl font-bold text-slate-900">Dashboard Admin</h1>
             <p class="text-slate-500 mt-1 text-sm">Gérez vos articles</p>
         </div>
-        <a href="{{ route('admin.posts.create') }}" class="btn btn-primary">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Nouvel article
-        </a>
+        <div class="flex gap-3">
+            <a href="{{ route('admin.comments.index') }}" class="btn btn-outline text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                Commentaires
+            </a>
+            <a href="{{ route('admin.posts.create') }}" class="btn btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Nouvel article
+            </a>
+        </div>
     </div>
 
     <!-- Stats -->
