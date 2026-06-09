@@ -53,11 +53,16 @@
             <!-- Cover -->
             <div>
                 <label for="cover_image" class="block text-sm font-semibold text-slate-700 mb-1.5">Image de couverture</label>
-                <div class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-indigo-300 transition-colors cursor-pointer" onclick="document.getElementById('cover_image').click()">
-                    <svg class="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <p class="text-sm text-slate-500">Cliquez pour choisir une image</p>
-                    <p class="text-xs text-slate-400 mt-1">JPG, PNG, GIF — max 2MB</p>
-                    <input type="file" name="cover_image" id="cover_image" accept="image/*" class="hidden">
+                <div id="cover-drop-zone" class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-indigo-300 transition-colors cursor-pointer" onclick="document.getElementById('cover_image').click()">
+                    <img id="cover-preview" src="" alt="Prévisualisation" class="hidden w-full h-48 object-cover rounded-lg mb-3">
+                    <div id="cover-placeholder">
+                        <svg class="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <p class="text-sm text-slate-500">Cliquez pour choisir une image</p>
+                        <p class="text-xs text-slate-400 mt-1">JPG, PNG, GIF — max 2MB</p>
+                    </div>
+                    <p id="cover-filename" class="hidden text-xs text-indigo-600 font-medium mt-2"></p>
+                    <input type="file" name="cover_image" id="cover_image" accept="image/*" class="hidden"
+                        onchange="previewImage(this, 'cover-preview', 'cover-placeholder', 'cover-filename')">
                 </div>
                 @error('cover_image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
@@ -72,8 +77,10 @@
                     <svg class="w-8 h-8 text-slate-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
                     <p class="text-sm text-slate-500">Sélectionner des fichiers (multiple)</p>
                     <p class="text-xs text-slate-400 mt-1">Images et vidéos — max 10MB chacun</p>
-                    <input type="file" name="media[]" id="media" accept="image/*,video/*" multiple class="hidden">
+                    <input type="file" name="media[]" id="media" accept="image/*,video/*" multiple class="hidden"
+                        onchange="previewMediaFiles(this)">
                 </div>
+                <div id="media-previews" class="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-3 hidden"></div>
                 @error('media.*') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
@@ -110,4 +117,48 @@
 
     </form>
 </div>
+
+<script>
+function previewImage(input, previewId, placeholderId, filenameId) {
+    const preview = document.getElementById(previewId);
+    const placeholder = document.getElementById(placeholderId);
+    const filename = document.getElementById(filenameId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            filename.textContent = input.files[0].name;
+            filename.classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function previewMediaFiles(input) {
+    const container = document.getElementById('media-previews');
+    container.innerHTML = '';
+    container.classList.remove('hidden');
+    Array.from(input.files).forEach(file => {
+        const div = document.createElement('div');
+        div.className = 'relative aspect-square rounded-lg overflow-hidden bg-slate-100';
+        if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.className = 'w-full h-full object-cover';
+            const reader = new FileReader();
+            reader.onload = e => img.src = e.target.result;
+            reader.readAsDataURL(file);
+            div.appendChild(img);
+        } else {
+            div.innerHTML = '<div class="w-full h-full flex items-center justify-center text-2xl">🎬</div>';
+        }
+        const label = document.createElement('p');
+        label.className = 'absolute bottom-0 left-0 right-0 text-xs text-white bg-black/50 px-1 py-0.5 truncate';
+        label.textContent = file.name;
+        div.appendChild(label);
+        container.appendChild(div);
+    });
+}
+</script>
 @endsection

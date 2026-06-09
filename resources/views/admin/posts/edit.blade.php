@@ -61,8 +61,10 @@
                 <div class="border-2 border-dashed border-slate-200 rounded-xl p-5 text-center hover:border-indigo-300 transition-colors cursor-pointer" onclick="document.getElementById('cover_image').click()">
                     <p class="text-sm text-slate-500">{{ $post->cover_image ? 'Remplacer l\'image' : 'Ajouter une image' }}</p>
                     <p class="text-xs text-slate-400 mt-0.5">JPG, PNG, GIF — max 2MB</p>
-                    <input type="file" name="cover_image" id="cover_image" accept="image/*" class="hidden">
+                    <input type="file" name="cover_image" id="cover_image" accept="image/*" class="hidden"
+                        onchange="previewImage(this)">
                 </div>
+                <img id="new-cover-preview" src="" alt="" class="hidden w-full h-48 object-cover rounded-xl mt-3 border border-slate-200">
                 @error('cover_image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
@@ -126,4 +128,18 @@
 
     </form>
 </div>
+
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('new-cover-preview');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
 @endsection
