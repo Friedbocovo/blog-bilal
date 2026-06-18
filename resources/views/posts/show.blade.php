@@ -57,6 +57,46 @@
                 {{ $post->title }}
             </h1>
 
+            <!-- Like button -->
+            <div x-data="{
+                liked: {{ $post->isLikedBy(auth()->user()) ? 'true' : 'false' }},
+                count: {{ $post->likes()->count() }},
+                async toggle() {
+                    @auth
+                    const res = await fetch('{{ route('posts.like', $post) }}', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, 'Accept': 'application/json' }
+                    });
+                    const data = await res.json();
+                    this.liked = data.liked;
+                    this.count = data.count;
+                    @else
+                    window.location = '{{ route('login') }}';
+                    @endauth
+                }
+            }" class="flex items-center gap-2 mb-6">
+                <button @click="toggle()"
+                    :class="liked ? 'bg-red-50 text-red-500 border-red-200' : 'bg-slate-50 text-slate-500 border-slate-200'"
+                    class="flex items-center gap-2 px-4 py-2 rounded-full border transition-all hover:scale-105">
+                    <svg class="w-5 h-5" :fill="liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                    <span class="font-semibold text-sm" x-text="count + (count <= 1 ? ' j\'aime' : ' j\'aimes')"></span>
+                </button>
+                {{-- Fallback sans JS --}}
+                <noscript>
+                    <form method="POST" action="{{ route('posts.like', $post) }}">
+                        @csrf
+                        <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-full border {{ $post->isLikedBy(auth()->user()) ? 'bg-red-50 text-red-500 border-red-200' : 'bg-slate-50 text-slate-500 border-slate-200' }} transition-all hover:scale-105">
+                            <svg class="w-5 h-5" fill="{{ $post->isLikedBy(auth()->user()) ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            <span class="font-semibold text-sm">{{ $post->likes()->count() }} {{ $post->likes()->count() <= 1 ? "j'aime" : "j'aimes" }}</span>
+                        </button>
+                    </form>
+                </noscript>
+            </div>
+
             @if($post->excerpt)
                 <p class="text-lg text-slate-500 border-l-4 border-indigo-300 pl-4 mb-8 italic">{{ $post->excerpt }}</p>
             @endif

@@ -30,6 +30,7 @@
             $published = $posts->getCollection()->where('status', 'published')->count();
             $drafts = $posts->getCollection()->where('status', 'draft')->count();
             $comments = $posts->getCollection()->sum('all_comments_count');
+            $totalLikes = $posts->getCollection()->sum('likes_count');
         @endphp
         <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
             <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Total</p>
@@ -40,12 +41,12 @@
             <p class="text-2xl font-bold text-green-600 mt-1">{{ $published }}</p>
         </div>
         <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-            <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Brouillons</p>
-            <p class="text-2xl font-bold text-slate-500 mt-1">{{ $drafts }}</p>
-        </div>
-        <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
             <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Commentaires</p>
             <p class="text-2xl font-bold text-indigo-600 mt-1">{{ $comments }}</p>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
+            <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">❤️ Likes</p>
+            <p class="text-2xl font-bold text-red-500 mt-1">{{ $totalLikes }}</p>
         </div>
     </div>
 
@@ -58,6 +59,7 @@
                         <th class="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Article</th>
                         <th class="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide hidden sm:table-cell">Statut</th>
                         <th class="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide hidden md:table-cell">Commentaires</th>
+                        <th class="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide hidden md:table-cell">❤️ Likes</th>
                         <th class="text-left px-4 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide hidden lg:table-cell">Date</th>
                         <th class="text-right px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
                     </tr>
@@ -98,6 +100,12 @@
                                 {{ $post->all_comments_count ?? 0 }}
                             </span>
                         </td>
+                        <td class="px-4 py-4 hidden md:table-cell">
+                            <span class="flex items-center gap-1.5 text-sm text-red-400">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                {{ $post->likes_count ?? 0 }}
+                            </span>
+                        </td>
                         <td class="px-4 py-4 hidden lg:table-cell">
                             <span class="text-sm text-slate-400">
                                 {{ $post->published_at ? $post->published_at->format('d M Y') : $post->created_at->format('d M Y') }}
@@ -121,7 +129,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-16 text-center">
+                        <td colspan="6" class="px-6 py-16 text-center">
                             <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
                                 <svg class="w-8 h-8 text-indigo-200" fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
                             </div>

@@ -8,7 +8,10 @@ $highlightedBody = preg_replace('/@([\w]+)/', '<span class="mention">@$1</span>'
         <div class="flex-1 min-w-0">
             <div class="bg-slate-50 rounded-xl px-4 py-3">
                 <div class="flex items-center gap-2 mb-1 flex-wrap">
-                    <span class="font-semibold text-sm text-slate-900">{{ $comment->author->name }}</span>
+                    <div>
+                        <span class="font-semibold text-sm text-slate-900">{{ $comment->author->name }}</span>
+                        <span class="block text-xs text-slate-400">@{{ $comment->author->username }}</span>
+                    </div>
                     @if($comment->author->isAdmin())
                         <span class="badge badge-accent text-xs">Admin</span>
                     @endif

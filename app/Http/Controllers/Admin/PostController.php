@@ -17,7 +17,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::with('author')
-            ->withCount('allComments')
+            ->withCount(['allComments', 'likes'])
             ->latest()
             ->paginate(20);
 
