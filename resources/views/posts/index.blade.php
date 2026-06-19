@@ -78,7 +78,7 @@
         <article class="post-card group grid md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="relative overflow-hidden bg-slate-100 h-64 md:h-auto">
                 @if($featured->cover_image)
-                    <img src="{{ asset('storage/' . $featured->cover_image) }}" alt="{{ $featured->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ $featured->cover_image }}" alt="{{ $featured->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 @else
                     <div class="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
@@ -124,7 +124,7 @@
         <article class="post-card group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
             <div class="relative overflow-hidden h-48 bg-slate-100">
                 @if($post->cover_image)
-                    <img src="{{ asset('storage/' . $post->cover_image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ $post->cover_image }}" alt="{{ $post->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 @else
                     <div class="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
                         <svg class="w-10 h-10 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>

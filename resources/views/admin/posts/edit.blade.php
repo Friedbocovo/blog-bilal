@@ -52,7 +52,7 @@
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Image de couverture actuelle</label>
                 @if($post->cover_image)
                     <div class="relative inline-block mb-3">
-                        <img src="{{ asset('storage/' . $post->cover_image) }}" alt="" class="w-40 h-28 object-cover rounded-xl border border-slate-200">
+                        <img src="{{ $post->cover_image }}" alt="" class="w-40 h-28 object-cover rounded-xl border border-slate-200">
                         <span class="absolute -top-2 -right-2 badge badge-green text-xs">Actuelle</span>
                     </div>
                 @else
@@ -76,9 +76,9 @@
                         @php $isVideo = str_ends_with($media, '.mp4') || str_ends_with($media, '.webm'); @endphp
                         <div class="relative aspect-square rounded-lg overflow-hidden bg-slate-100">
                             @if($isVideo)
-                                <video class="w-full h-full object-cover"><source src="{{ asset('storage/' . $media) }}"></video>
+                                <video class="w-full h-full object-cover"><source src="{{ $media }}"></video>
                             @else
-                                <img src="{{ asset('storage/' . $media) }}" alt="" class="w-full h-full object-cover">
+                                <img src="{{ $media }}" alt="" class="w-full h-full object-cover">
                             @endif
                         </div>
                     @endforeach

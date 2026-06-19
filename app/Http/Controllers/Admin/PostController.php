@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -32,22 +31,32 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string|max:500',
-            'content' => 'required|string',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'media.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,webm|max:10240',
-            'status' => 'required|in:draft,published',
+            'title'       => 'required|string|max:255',
+            'excerpt'     => 'nullable|string|max:500',
+            'content'     => 'required|string',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'media.*'     => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,webm|max:20480',
+            'status'      => 'required|in:draft,published',
         ]);
 
+        // Upload cover image to Cloudinary
         if ($request->hasFile('cover_image')) {
-            $validated['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+            $result = cloudinary()->upload($request->file('cover_image')->getRealPath(), [
+                'folder' => 'blog/covers',
+            ]);
+            $validated['cover_image'] = $result->getSecurePath();
         }
 
+        // Upload media files to Cloudinary
         $validated['media'] = [];
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
-                $validated['media'][] = $file->store('media', 'public');
+                $isVideo = in_array($file->getClientOriginalExtension(), ['mp4', 'webm']);
+                $result = cloudinary()->upload($file->getRealPath(), [
+                    'folder'        => 'blog/media',
+                    'resource_type' => $isVideo ? 'video' : 'image',
+                ]);
+                $validated['media'][] = $result->getSecurePath();
             }
         }
 
@@ -70,25 +79,32 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string|max:500',
-            'content' => 'required|string',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'media.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,webm|max:10240',
-            'status' => 'required|in:draft,published',
+            'title'       => 'required|string|max:255',
+            'excerpt'     => 'nullable|string|max:500',
+            'content'     => 'required|string',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'media.*'     => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,webm|max:20480',
+            'status'      => 'required|in:draft,published',
         ]);
 
+        // Upload new cover image to Cloudinary
         if ($request->hasFile('cover_image')) {
-            if ($post->cover_image) {
-                Storage::disk('public')->delete($post->cover_image);
-            }
-            $validated['cover_image'] = $request->file('cover_image')->store('covers', 'public');
+            $result = cloudinary()->upload($request->file('cover_image')->getRealPath(), [
+                'folder' => 'blog/covers',
+            ]);
+            $validated['cover_image'] = $result->getSecurePath();
         }
 
+        // Append new media files to Cloudinary
         $media = $post->media ?? [];
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
-                $media[] = $file->store('media', 'public');
+                $isVideo = in_array($file->getClientOriginalExtension(), ['mp4', 'webm']);
+                $result = cloudinary()->upload($file->getRealPath(), [
+                    'folder'        => 'blog/media',
+                    'resource_type' => $isVideo ? 'video' : 'image',
+                ]);
+                $media[] = $result->getSecurePath();
             }
             $validated['media'] = $media;
         }
@@ -104,19 +120,9 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-        if ($post->cover_image) {
-            Storage::disk('public')->delete($post->cover_image);
-        }
-
-        if ($post->media) {
-            foreach ($post->media as $file) {
-                Storage::disk('public')->delete($file);
-            }
-        }
-
+        // Les URLs Cloudinary sont permanentes, pas besoin de les supprimer manuellement
         $post->delete();
 
         return redirect()->route('admin.posts.index')->with('success', 'Article supprimé.');
     }
 }
-

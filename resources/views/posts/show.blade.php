@@ -15,7 +15,7 @@
     <!-- Cover Image -->
     @if($post->cover_image)
         <div class="relative overflow-hidden rounded-2xl mb-8 shadow-lg h-72 md:h-96">
-            <img src="{{ asset('storage/' . $post->cover_image) }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
+            <img src="{{ $post->cover_image }}" alt="{{ $post->title }}" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
         </div>
     @endif
@@ -101,9 +101,53 @@
                 <p class="text-lg text-slate-500 border-l-4 border-indigo-300 pl-4 mb-8 italic">{{ $post->excerpt }}</p>
             @endif
 
+            <!-- Like button -->
+            <div class="flex items-center gap-4 mb-8" x-data="likeButton({{ $post->id }}, {{ $post->likes()->count() }}, {{ $post->isLikedBy(auth()->user()) ? 'true' : 'false' }})">
+                <button @click="toggle"
+                    :class="liked ? 'bg-red-50 border-red-200 text-red-600' : 'bg-slate-50 border-slate-200 text-slate-500'"
+                    class="flex items-center gap-2 px-4 py-2 rounded-full border transition-all hover:scale-105">
+                    <svg class="w-5 h-5 transition-transform" :class="liked ? 'scale-110 fill-red-500' : 'fill-none'"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                    <span class="font-semibold text-sm" x-text="count + (count > 1 ? ' j\'aime' : ' j\'aime')"></span>
+                </button>
+                @guest
+                    <p class="text-xs text-slate-400">Connectez-vous pour aimer cet article</p>
+                @endguest
+            </div>
+
+            <script>
+            function likeButton(postId, initialCount, initialLiked) {
+                return {
+                    liked: initialLiked,
+                    count: initialCount,
+                    toggle() {
+                        @auth
+                        fetch(`/posts/${postId}/like`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json',
+                            }
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            this.liked = data.liked;
+                            this.count = data.count;
+                        });
+                        @else
+                        window.location.href = '{{ route('login') }}';
+                        @endauth
+                    }
+                }
+            }
+            </script>
+
             <!-- Media Gallery -->
             @if($post->media && count($post->media) > 0)
-                <div class="mb-8" x-data="{ lightbox: false, current: 0, items: {{ json_encode(array_map(fn($m) => ['src' => asset('storage/'.$m), 'type' => str_ends_with($m, '.mp4') || str_ends_with($m, '.webm') ? 'video' : 'image'], $post->media)) }} }">
+                <div class="mb-8" x-data="{ lightbox: false, current: 0, items: {{ json_encode(array_map(fn($m) => ['src' => $m, 'type' => str_ends_with($m, '.mp4') || str_ends_with($m, '.webm') ? 'video' : 'image'], $post->media)) }} }">
                     <div class="grid grid-cols-2 {{ count($post->media) > 2 ? 'md:grid-cols-3' : '' }} gap-3 rounded-xl overflow-hidden">
                         @foreach($post->media as $index => $media)
                             @php $isVideo = str_ends_with($media, '.mp4') || str_ends_with($media, '.webm'); @endphp
@@ -111,7 +155,7 @@
                                 class="group relative overflow-hidden rounded-xl bg-slate-100 aspect-video focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 @if($isVideo)
                                     <video muted autoplay loop class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                        <source src="{{ asset('storage/' . $media) }}" type="video/{{ pathinfo($media, PATHINFO_EXTENSION) }}">
+                                        <source src="{{ $media }}" type="video/{{ pathinfo($media, PATHINFO_EXTENSION) }}">
                                     </video>
                                     <div class="absolute inset-0 flex items-center justify-center">
                                         <div class="w-12 h-12 bg-black/50 backdrop-blur rounded-full flex items-center justify-center">
@@ -119,7 +163,7 @@
                                         </div>
                                     </div>
                                 @else
-                                    <img src="{{ asset('storage/' . $media) }}" alt="Media {{ $index+1 }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                    <img src="{{ $media }}" alt="Media {{ $index+1 }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                 @endif
                                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                             </button>

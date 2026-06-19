@@ -86,6 +86,17 @@ class Post extends Model
 
     public function likes(): HasMany
     {
+        return $this->hasMany(\App\Models\PostLike::class);
+    }
+
+    public function isLikedBy(?User $user): bool
+    {
+        if (!$user) return false;
+        return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    public function likes(): HasMany
+    {
         return $this->hasMany(PostLike::class);
     }
 
