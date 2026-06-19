@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
-use App\Models\PostLike;
 
 class Post extends Model
 {
@@ -30,9 +29,6 @@ class Post extends Model
         'media' => 'array',
     ];
 
-    /**
-     * Boot the model
-     */
     protected static function boot()
     {
         parent::boot();
@@ -50,25 +46,16 @@ class Post extends Model
         });
     }
 
-    /**
-     * Get the route key for model binding
-     */
     public function getRouteKeyName(): string
     {
         return 'slug';
     }
 
-    /**
-     * Scope published posts
-     */
     public function scopePublished($query)
     {
         return $query->where('status', 'published')->orderBy('published_at', 'desc');
     }
 
-    /**
-     * Relations
-     */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -86,17 +73,6 @@ class Post extends Model
 
     public function likes(): HasMany
     {
-        return $this->hasMany(\App\Models\PostLike::class);
-    }
-
-    public function isLikedBy(?User $user): bool
-    {
-        if (!$user) return false;
-        return $this->likes()->where('user_id', $user->id)->exists();
-    }
-
-    public function likes(): HasMany
-    {
         return $this->hasMany(PostLike::class);
     }
 
@@ -106,4 +82,3 @@ class Post extends Model
         return $this->likes()->where('user_id', $user->id)->exists();
     }
 }
-
