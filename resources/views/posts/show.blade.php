@@ -101,50 +101,6 @@
                 <p class="text-lg text-slate-500 border-l-4 border-indigo-300 pl-4 mb-8 italic">{{ $post->excerpt }}</p>
             @endif
 
-            <!-- Like button -->
-            <div class="flex items-center gap-4 mb-8" x-data="likeButton({{ $post->id }}, {{ $post->likes()->count() }}, {{ $post->isLikedBy(auth()->user()) ? 'true' : 'false' }})">
-                <button @click="toggle"
-                    :class="liked ? 'bg-red-50 border-red-200 text-red-600' : 'bg-slate-50 border-slate-200 text-slate-500'"
-                    class="flex items-center gap-2 px-4 py-2 rounded-full border transition-all hover:scale-105">
-                    <svg class="w-5 h-5 transition-transform" :class="liked ? 'scale-110 fill-red-500' : 'fill-none'"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                    </svg>
-                    <span class="font-semibold text-sm" x-text="count + (count > 1 ? ' j\'aime' : ' j\'aime')"></span>
-                </button>
-                @guest
-                    <p class="text-xs text-slate-400">Connectez-vous pour aimer cet article</p>
-                @endguest
-            </div>
-
-            <script>
-            function likeButton(postId, initialCount, initialLiked) {
-                return {
-                    liked: initialLiked,
-                    count: initialCount,
-                    toggle() {
-                        @auth
-                        fetch(`/posts/${postId}/like`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Accept': 'application/json',
-                            }
-                        })
-                        .then(r => r.json())
-                        .then(data => {
-                            this.liked = data.liked;
-                            this.count = data.count;
-                        });
-                        @else
-                        window.location.href = '{{ route('login') }}';
-                        @endauth
-                    }
-                }
-            }
-            </script>
-
             <!-- Media Gallery -->
             @if($post->media && count($post->media) > 0)
                 <div class="mb-8" x-data="{ lightbox: false, current: 0, items: {{ json_encode(array_map(fn($m) => ['src' => $m, 'type' => str_ends_with($m, '.mp4') || str_ends_with($m, '.webm') ? 'video' : 'image'], $post->media)) }} }">
